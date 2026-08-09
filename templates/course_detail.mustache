@@ -35,10 +35,20 @@
             {{/fields}}
         </dl>
 
-        <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
-            {{#isenrolled}}{{#str}}gotocourse, local_rofeo{{/str}}{{/isenrolled}}
-            {{^isenrolled}}{{#str}}requestaccess, local_rofeo{{/str}}{{/isenrolled}}
-        </a>
+        {{#canaccess}}
+            <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
+                {{#str}}gotocourse, local_rofeo{{/str}}
+            </a>
+        {{/canaccess}}
+        {{#canrequest}}
+            <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
+                {{#str}}requestaccess, local_rofeo{{/str}}
+            </a>
+        {{/canrequest}}
+        {{#isclosed}}
+            <p class="rofeo-detail__closed">{{#str}}enrolmentclosed, local_rofeo{{/str}}</p>
+        {{/isclosed}}
+
     </aside>
 
 </div>

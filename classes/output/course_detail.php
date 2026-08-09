@@ -26,7 +26,22 @@ class course_detail implements renderable, templatable {
         $course = $this->course;
         $context = context_course::instance($course->id);
         $listelement = new core_course_list_element($course);
-        $isenrolled = is_enrolled($context, null, '', true);
+        
+        $canaccess = can_access_course($course);
+        $isloggedin = isloggedin() && !isguestuser();
+
+        if ($canaccess) {
+            $state = 'access';
+            $url = new moodle_url('/course/view.php', ['id' => $course->id]);
+        } else if (!$isloggedin || enrol_selfenrol_available($course->id)) {
+            // Anonymous visitors always get the button: they have to log in first,
+            // and enrol/index.php will tell them where they stand afterwards.
+            $state = 'request';
+            $url = new moodle_url('/enrol/index.php', ['id' => $course->id]);
+        } else {
+            $state = 'closed';
+            $url = null;
+        }
 
         $image = '';
         foreach ($listelement->get_course_overviewfiles() as $file) {
@@ -58,6 +73,10 @@ class course_detail implements renderable, templatable {
             'actionurl'    => $isenrolled
                 ? (new moodle_url('/course/view.php', ['id' => $course->id]))->out(false)
                 : (new moodle_url('/enrol/index.php', ['id' => $course->id]))->out(false),
+            'canaccess'  => $state === 'access',
+            'canrequest' => $state === 'request',
+            'isclosed'   => $state === 'closed',
+            'actionurl'  => $url ? $url->out(false) : '',
         ];
     }
 
