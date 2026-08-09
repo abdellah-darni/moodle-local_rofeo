@@ -1,0 +1,44 @@
+<div class="rofeo-detail">
+
+    <div class="rofeo-detail__main">
+        {{#hascategory}}
+            <div class="rofeo-detail__category">{{{ categoryname }}}</div>
+        {{/hascategory}}
+
+        <h1 class="rofeo-detail__title">{{{ fullname }}}</h1>
+
+        {{#hassummary}}
+            <div class="rofeo-detail__summary">{{{ summary }}}</div>
+        {{/hassummary}}
+
+        {{#fields}}
+            {{#islong}}
+                <div class="rofeo-detail__section">
+                    <h2 class="rofeo-detail__section-title">{{{ name }}}</h2>
+                    <div class="rofeo-detail__section-body">{{{ value }}}</div>
+                </div>
+            {{/islong}}
+        {{/fields}}
+    </div>
+
+    <aside class="rofeo-detail__side">
+        {{#hasimage}}
+            <img src="{{ image }}" alt="" class="rofeo-detail__img">
+        {{/hasimage}}
+
+        <dl class="rofeo-detail__meta">
+            {{#fields}}
+                {{^islong}}
+                    <dt>{{{ name }}}</dt>
+                    <dd>{{{ value }}}</dd>
+                {{/islong}}
+            {{/fields}}
+        </dl>
+
+        <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
+            {{#isenrolled}}{{#str}}gotocourse, local_rofeo{{/str}}{{/isenrolled}}
+            {{^isenrolled}}{{#str}}requestaccess, local_rofeo{{/str}}{{/isenrolled}}
+        </a>
+    </aside>
+
+</div>
