@@ -18,6 +18,7 @@ $PAGE->set_course($course);
 $PAGE->set_pagelayout('base');
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading('');
+$PAGE->add_body_class('rofeo-has-footer');
 
 $detail = new \local_rofeo\output\course_detail($course);
 
