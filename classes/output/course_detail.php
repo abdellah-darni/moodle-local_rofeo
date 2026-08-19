@@ -60,6 +60,9 @@ class course_detail implements renderable, templatable {
             $categoryname = $category->get_formatted_name();
         }
 
+        $metafields = $this->export_metafields();
+        $cardfields = $this->export_cardfields();
+
         return [
             'fullname'     => format_string($course->fullname, true, ['context' => $context]),
             'categoryname' => $categoryname,
@@ -68,11 +71,10 @@ class course_detail implements renderable, templatable {
             'hasimage'     => (bool) $image,
             'summary'      => format_text($course->summary, $course->summaryformat, ['context' => $context]),
             'hassummary'   => trim(strip_tags($course->summary)) !== '',
-            'fields'       => $this->export_fields(),
-            'isenrolled'   => $isenrolled,
-            'actionurl'    => $isenrolled
-                ? (new moodle_url('/course/view.php', ['id' => $course->id]))->out(false)
-                : (new moodle_url('/enrol/index.php', ['id' => $course->id]))->out(false),
+            'metafields'    => $metafields,
+            'hasmetafields' => (bool) $metafields,
+            'cardfields'    => $cardfields,
+            'hascardfields' => (bool) $cardfields,
             'canaccess'  => $state === 'access',
             'canrequest' => $state === 'request',
             'isclosed'   => $state === 'closed',
@@ -80,21 +82,64 @@ class course_detail implements renderable, templatable {
         ];
     }
 
-    protected function export_fields(): array {
-        $result = [];
+    protected function export_metafields(): array {
+        static $icons = [
+            'niveau' => 'fa-signal',
+            'age'    => 'fa-user',
+            'duree'  => 'fa-clock-o',
+        ];
+
+        $bysortname = [];
         $handler = \core_course\customfield\course_handler::create();
-
         foreach ($handler->export_instance_data($this->course->id, true) as $data) {
-            $value = $data->get_value();
+            $bysortname[$data->get_shortname()] = $data;
+        }
 
+        $result = [];
+        foreach ($icons as $shortname => $icon) {
+            if (!isset($bysortname[$shortname])) {
+                continue;
+            }
+
+            $value = $bysortname[$shortname]->get_value();
             if ($value === '' || $value === null || $value === '-') {
                 continue;
             }
 
             $result[] = [
-                'name'   => $data->get_name(),
-                'value'  => $value,
-                'islong' => $data->get_type() === 'textarea',
+                'value'   => format_string($value),
+                'icon'    => $icon,
+                'islevel' => $shortname === 'niveau',
+            ];
+        }
+
+        return $result;
+    }
+
+    protected function export_cardfields(): array {
+        static $icons = [
+            'objectifs'  => 'fa-flag',
+            'prerequis'  => 'fa-wrench',
+        ];
+        static $fallbackicon = 'fa-list-alt';
+
+        $result = [];
+        $handler = \core_course\customfield\course_handler::create();
+
+        foreach ($handler->export_instance_data($this->course->id, true) as $data) {
+            if ($data->get_type() !== 'textarea') {
+                continue;
+            }
+
+            $value = $data->get_value();
+            if ($value === '' || $value === null || $value === '-') {
+                continue;
+            }
+
+            $result[] = [
+                'name'  => $data->get_name(),
+                'value' => $value,
+                'icon'  => $icons[$data->get_shortname()] ?? $fallbackicon,
             ];
         }
 
