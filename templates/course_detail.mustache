@@ -1,17 +1,10 @@
-{{!
-    @template local_rofeo/course_detail
-
-    Context variables required for this template:
-    * fullname, hascategory, categoryname, hassummary, summary - course header
-    * hasimage, image - course overview image, may be absent
-    * hasmetafields, metafields - niveau/age/duree pills: each {value, icon, islevel
-    * hascardfields, cardfields - generic textarea custom fields (Objectifs,
-      Prérequis, ...): each {name, value, icon
-    * canaccess, canrequest, isclosed, actionurl - action button state
-}}
 <div class="rofeo-detail">
 
     <section class="rofeo-detail__hero">
+        {{#hasimage}}
+            <img src="{{ image }}" alt="" aria-hidden="true" class="rofeo-detail__hero-bg">
+        {{/hasimage}}
+        <div class="rofeo-detail__hero-tint"></div>
         <div class="rofeo-detail__hero-inner">
             {{#hascategory}}
                 <span class="rofeo-detail__category">{{{ categoryname }}}</span>
@@ -28,17 +21,14 @@
     <div class="rofeo-detail__body">
 
         <div class="rofeo-detail__main">
-            {{#hascardfields}}
-                <div class="rofeo-detail__cards">
-                    {{#cardfields}}
-                        <div class="rofeo-detail__card">
-                            <div class="rofeo-detail__card-icon"><i class="fa {{ icon }}"></i></div>
-                            <h2 class="rofeo-detail__card-title">{{{ name }}}</h2>
-                            <div class="rofeo-detail__card-body">{{{ value }}}</div>
-                        </div>
-                    {{/cardfields}}
-                </div>
-            {{/hascardfields}}
+            {{#fields}}
+                {{#islong}}
+                    <div class="rofeo-detail__section">
+                        <h2 class="rofeo-detail__section-title">{{{ name }}}</h2>
+                        <div class="rofeo-detail__section-body">{{{ value }}}</div>
+                    </div>
+                {{/islong}}
+            {{/fields}}
         </div>
 
         <aside class="rofeo-detail__side">
@@ -46,31 +36,29 @@
                 <img src="{{ image }}" alt="" class="rofeo-detail__img">
             {{/hasimage}}
 
-            <div class="rofeo-detail__side-body">
-                {{#hasmetafields}}
-                    <div class="rofeo-detail__meta">
-                        {{#metafields}}
-                            <span class="rofeo-detail__pill {{#islevel}}rofeo-detail__pill--level{{/islevel}}">
-                                <i class="fa {{ icon }}"></i> {{ value }}
-                            </span>
-                        {{/metafields}}
-                    </div>
-                {{/hasmetafields}}
+            <dl class="rofeo-detail__meta">
+                {{#fields}}
+                    {{^islong}}
+                        <dt>{{{ name }}}</dt>
+                        <dd>{{{ value }}}</dd>
+                    {{/islong}}
+                {{/fields}}
+            </dl>
 
-                {{#canaccess}}
-                    <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
-                        {{#str}}gotocourse, local_rofeo{{/str}}
-                    </a>
-                {{/canaccess}}
-                {{#canrequest}}
-                    <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
-                        {{#str}}requestaccess, local_rofeo{{/str}}
-                    </a>
-                {{/canrequest}}
-                {{#isclosed}}
-                    <p class="rofeo-detail__closed">{{#str}}enrolmentclosed, local_rofeo{{/str}}</p>
-                {{/isclosed}}
-            </div>
+            {{#canaccess}}
+                <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
+                    {{#str}}gotocourse, local_rofeo{{/str}}
+                </a>
+            {{/canaccess}}
+            {{#canrequest}}
+                <a href="{{ actionurl }}" class="btn btn-primary btn-lg w-100">
+                    {{#str}}requestaccess, local_rofeo{{/str}}
+                </a>
+            {{/canrequest}}
+            {{#isclosed}}
+                <p class="rofeo-detail__closed">{{#str}}enrolmentclosed, local_rofeo{{/str}}</p>
+            {{/isclosed}}
+
         </aside>
 
     </div>
